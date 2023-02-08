@@ -1,5 +1,5 @@
 import numpy as np
-import heapq
+import heapq as hq
 from typing import Union
 
 class Graph:
@@ -26,6 +26,46 @@ class Graph:
             return np.loadtxt(f, delimiter=',')
 
     def construct_mst(self):
+
+        #arbitrary
+        init_node = 0
+
+        #number of nodes
+        n = self.adj_mat.shape[0]
+        #nodes_visited = np.zeros(n) #one hot encoding
+        nodes_visited = [init_node]
+        #unused_edges = [[x, init_node, w] for x, w in enumerate(self.adj_mat[init_node])]
+        #unused_edges.sort(key=lambda x: x[2])
+        h = []
+        [hq.heappush(h, (w, init_node, x)) for x, w in enumerate(self.adj_mat[init_node]) if w != 0]
+
+        self.mst = np.zeros(self.adj_mat.shape)
+
+        while True:
+            #get the lowest-weighted edge
+            try:
+                edge = hq.heappop(h)
+            except IndexError as e:
+                raise IndexError("graph is probably disconnected, which this implementation does not support.") from e
+
+            #this check is necessary for cyclic graphs
+            if edge[2] not in nodes_visited:
+                #add the lowest-weighted edge's destination node's edges to the heap
+                [hq.heappush(h, (w, edge[2], x)) for x, w in enumerate(self.adj_mat[edge[2]]) if w != 0]
+                self.mst[edge[1]][edge[2]] = edge[0]
+                self.mst[edge[2]][edge[1]] = edge[0]
+                nodes_visited.append(edge[2])
+                #print(nodes_visited)
+                #print(edge)
+                if len(nodes_visited) == n:
+                    break
+            #else:
+            #    print(f"node {edge[2]} already in heap; skipping it")
+
+        #print(self.adj_mat)
+        #print(self.mst)
+
+
         """
     
         TODO: Given `self.adj_mat`, the adjacency matrix of a connected undirected graph, implement Prim's 
@@ -41,4 +81,9 @@ class Graph:
         `heapify`, `heappop`, and `heappush` functions.
 
         """
-        self.mst = None
+
+        #self.mst = None
+
+file_path = '../data/small.csv'
+g = Graph(file_path)
+g.construct_mst()

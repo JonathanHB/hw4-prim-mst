@@ -27,7 +27,7 @@ def check_mst(adj_mat: np.ndarray,
 
     """
 
-    mstg = nx.from_numpy_matrix(adj_mat, parallel_edges=False, create_using=None)
+    mstg = nx.from_numpy_array(adj_mat, parallel_edges=False, create_using=None)
     assert nx.is_connected(mstg), "MST is not connected"
 
 
@@ -42,8 +42,6 @@ def check_mst(adj_mat: np.ndarray,
                 n_edges+=1
             total += mst[i, j]
 
-    print(total)
-    print(expected_weight)
     assert approx_equal(total, expected_weight), 'Proposed MST has incorrect expected weight'
     assert n_edges == mst.shape[0]-1, f"MST has {n_edges} edges but should have {mst.shape[0]-1}."
 
@@ -54,7 +52,7 @@ def test_mst_small():
     Unit test for the construction of a minimum spanning tree on a small graph.
     
     """
-    file_path = '../data/small.csv'
+    file_path = './data/small.csv'
     g = Graph(file_path)
     g.construct_mst()
     check_mst(g.adj_mat, g.mst, 8)
@@ -69,7 +67,7 @@ def test_mst_single_cell_data():
     https://bioconductor.org/packages/release/bioc/html/slingshot.html
 
     """
-    file_path = '../data/slingshot_example.txt'
+    file_path = './data/slingshot_example.txt'
     coords = np.loadtxt(file_path) # load coordinates of single cells in low-dimensional subspace
     dist_mat = pairwise_distances(coords) # compute pairwise distances to form graph
     g = Graph(dist_mat)
@@ -86,7 +84,6 @@ def test_mst_student():
     adjout = []
 
     while True:
-        print("iter")
 
         testadj = np.random.rand(n_nodes,n_nodes)
         for x in range(n_nodes):
@@ -102,7 +99,7 @@ def test_mst_student():
                     testadj[y,x] = rescaled
 
 
-        mstg = nx.from_numpy_matrix(testadj, parallel_edges=False, create_using=None)
+        mstg = nx.from_numpy_array(testadj, parallel_edges=False, create_using=None)
         if nx.is_connected(mstg):
             adjout = testadj
             break
@@ -115,7 +112,7 @@ def test_mst_student():
     g.construct_mst()
 
     #networkx benchmark
-    g2 = nx.from_numpy_matrix(adjout, parallel_edges=False, create_using=None)
+    g2 = nx.from_numpy_array(adjout, parallel_edges=False, create_using=None)
     expected_mst_sum = sum([e[2]['weight'] for e in nx.minimum_spanning_edges(g2)])
 
     check_mst(g.adj_mat, g.mst, expected_mst_sum)

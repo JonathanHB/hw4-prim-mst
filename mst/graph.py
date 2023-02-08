@@ -84,6 +84,6 @@ class Graph:
 
         #self.mst = None
 
-file_path = '../data/small.csv'
-g = Graph(file_path)
-g.construct_mst()
+# file_path = '../data/small.csv'
+# g = Graph(file_path)
+# g.construct_mst()
